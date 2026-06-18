@@ -112,8 +112,7 @@ function Faq({ items }) {
   )
 }
 
-// Shared "How It Works" interactive block — used on Home and the How It Works page.
-// Each of the 3 steps now has its own dedicated phone composite.
+// Interactive 3-step explainer used on Home and the How It Works page.
 function HiwBlock() {
   const [activeStep, setActiveStep] = useState(0)
   useEffect(() => {
@@ -122,9 +121,9 @@ function HiwBlock() {
   }, [])
 
   const images = [
-    '/assets/hiw_choose_agencies.png', // Choose your service — Welcome @Yuven / Agencies list
-    '/assets/hiw_pick_trip.png',       // Pick your trip — Your Route / Economy-Comfort
-    '/assets/hiw_pay_methods.png',      // Pay with mobile money — Payment Methods
+    '/assets/hiw_choose_agencies.png',
+    '/assets/hiw_pick_trip.png',
+    '/assets/hiw_pay_methods.png',
   ]
   const slideImg = images[activeStep]
 
@@ -135,10 +134,10 @@ function HiwBlock() {
           <img src={slideImg} alt="How it works" className="hiw-main-img" />
         </div>
         <div className="hiw-arrows">
-          <button onClick={() => setActiveStep(s => (s + 2) % 3)} className="arr-btn">
+          <button onClick={() => setActiveStep(s => (s + 2) % 3)} className="arr-btn" aria-label="Previous step">
             <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
-          <button onClick={() => setActiveStep(s => (s + 1) % 3)} className="arr-btn">
+          <button onClick={() => setActiveStep(s => (s + 1) % 3)} className="arr-btn" aria-label="Next step">
             <svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
           </button>
         </div>
@@ -175,8 +174,6 @@ function Home() {
 
   return (
     <>
-      {/* HERO — section2.png already has the headline, subtitle, and buttons baked in.
-          Only the stats pills are real HTML, overlaid at the bottom. */}
       <div className="home-hero">
         <img src="/assets/section2.png" alt="Move freely anywhere in Cameroon" />
         <div className="hero-stats">
@@ -184,9 +181,16 @@ function Home() {
           <span>6+ Functional Cities</span>
           <span>5+ Agencies Registered</span>
         </div>
+        <div className="hero-mobile-panel">
+          <h1>Move freely, anywhere in <span className="green">Cameroon</span>.</h1>
+          <p>From your street to any city, just one app necessary. Book travel tickets and rides.</p>
+          <div className="hero-mobile-btns">
+            <button className="btn-g">Book a Ride</button>
+            <button className="btn-outline">Book Travel Ticket</button>
+          </div>
+        </div>
       </div>
 
-      {/* OUR SERVICES */}
       <section className="s-white">
         <div className="wrap">
           <h2 className="h2d tc">Our services</h2>
@@ -204,7 +208,6 @@ function Home() {
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
       <section className="s-dgreen">
         <div className="wrap">
           <div className="eyebrow">Simple Steps</div>
@@ -214,7 +217,6 @@ function Home() {
         </div>
       </section>
 
-      {/* ABOUT */}
       <section className="s-white">
         <div className="wrap tc">
           <div className="eyebrow green">About us</div>
@@ -223,7 +225,6 @@ function Home() {
         </div>
       </section>
 
-      {/* MISSION */}
       <section className="s-pale">
         <div className="wrap mission-wrap">
           <div>
@@ -237,7 +238,6 @@ function Home() {
         </div>
       </section>
 
-      {/* EARN — image left/text right, then text left/image right, then image left/text right */}
       <section className="s-white">
         <div className="wrap">
           <h2 className="h2d tc">Earn money with Willti</h2>
@@ -269,7 +269,6 @@ function Home() {
         </div>
       </section>
 
-      {/* DOWNLOAD */}
       <section className="s-dgreen">
         <div className="wrap tc">
           <h2 className="h2w">Download Willti</h2>
@@ -288,7 +287,6 @@ function Home() {
         </div>
       </section>
 
-      {/* NEWS */}
       <section className="s-white">
         <div className="wrap">
           <div className="news-hd">
@@ -320,7 +318,6 @@ function Home() {
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="s-white">
         <div className="wrap">
           <h2 className="faq-title tc">Frequently Asked Questions</h2>
@@ -484,11 +481,13 @@ function Partner() {
 
   return (
     <>
-      {/* bus_booking.png already has the headline and subtitle baked in.
-          partner-scrim just darkens the image slightly for better text contrast — no duplicate text. */}
       <div className="partner-hero">
         <img src="/assets/bus_booking.png" alt="Partner with Willti"/>
         <div className="partner-scrim"/>
+        <div className="partner-mobile-panel">
+          <h1>Fill every seat.<br/><span className="green">Grow your agency.</span></h1>
+          <p>Connect your buses to thousands of travellers across Cameroon, with real-time bookings and instant Mobile Money payouts.</p>
+        </div>
       </div>
 
       <section className="s-white">
@@ -512,7 +511,6 @@ function Partner() {
         </div>
       </section>
 
-      {/* STATS — belongs on Partner, not Home, per the Figma flow */}
       <section className="s-white stats-sec">
         <div className="wrap">
           <div className="stats-img"><img src="/assets/woman_bus.png" alt="Traveller"/></div>

@@ -698,6 +698,74 @@ function Support() {
   )
 }
 
+// ── DELETE ACCOUNT REQUEST ────────────────────────────────────────────────────
+function DeleteAccountRequest() {
+  const [form, setForm] = useState({ name: '', email: '', reason: '' })
+  const [sent, setSent] = useState(false)
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    // For now this just confirms receipt in the UI.
+    // Wire this to a real endpoint/email service once the backend route exists.
+    setSent(true)
+  }
+
+  return (
+    <section className="s-white legal-page">
+      <div className="wrap legal-wrap form-wrap">
+        <h1 className="h2d">Request Account Deletion</h1>
+        <p className="legal-intro">
+          Use this form to request permanent deletion of your Willti account and associated data.
+          We'll process your request and confirm by email within a few business days, in line with
+          our <Link to="/privacy-policy" className="green">Privacy Policy</Link>.
+        </p>
+
+        {sent ? (
+          <div className="legal-section">
+            <h3>Request received</h3>
+            <p>Thanks — we've logged your deletion request. We'll follow up at the email address you provided to confirm once your account and data have been removed.</p>
+          </div>
+        ) : (
+          <form className="form-grid" onSubmit={handleSubmit}>
+            <div className="fg full">
+              <label>Full Name</label>
+              <input
+                required
+                value={form.name}
+                onChange={e => set('name', e.target.value)}
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div className="fg full">
+              <label>Account Email</label>
+              <input
+                required
+                type="email"
+                value={form.email}
+                onChange={e => set('email', e.target.value)}
+                placeholder="The email linked to your Willti account"
+              />
+            </div>
+            <div className="fg full">
+              <label>Reason for deletion (optional)</label>
+              <textarea
+                rows={5}
+                value={form.reason}
+                onChange={e => set('reason', e.target.value)}
+                placeholder="Let us know why you're leaving, this helps us improve"
+              />
+            </div>
+            <div className="full">
+              <button type="submit" className="btn-submit">Submit Deletion Request</button>
+            </div>
+          </form>
+        )}
+      </div>
+    </section>
+  )
+}
+
 // ── PRIVACY POLICY ────────────────────────────────────────────────────────────
 function PrivacyPolicy() {
   const sections = [
@@ -923,6 +991,8 @@ export default function App() {
           <Route path="/partner" element={<Partner/>}/>
           <Route path="/support" element={<Support/>}/>
           <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
+          <Route path="/delete/request" element={<DeleteAccountRequest/>}/>
+
         </Routes>
       </main>
       <Footer/>

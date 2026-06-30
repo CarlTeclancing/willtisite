@@ -3,8 +3,14 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import './App.css'
 
 function ScrollToTop() {
-  const { pathname } = useLocation()
-  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (hash) {
+      const el = document.getElementById(hash.slice(1))
+      if (el) { el.scrollIntoView({ behavior: 'smooth' }); return }
+    }
+    window.scrollTo(0, 0)
+  }, [pathname, hash])
   return null
 }
 
@@ -22,7 +28,7 @@ function Nav() {
   return (
     <nav className={scrolled ? 'scrolled' : ''}>
       <div className="nav-inner">
-        <Link to="/"><img src="/assets/logo.png" alt="willTi" className="logo-img" /></Link>
+        <Link to="/"><img src="/assets/logo.png" alt="willTi" className="logo-img" loading="eager" decoding="async" /></Link>
         <ul className={`nav-links ${open ? 'open' : ''}`}>
           <li><Link to="/how-it-works" className={a('/how-it-works')}>How It Works</Link></li>
           <li><Link to="/drive" className={a('/drive')}>Drive with Willti</Link></li>
@@ -31,7 +37,7 @@ function Nav() {
         </ul>
         <div className="nav-right">
           <button className="lang-btn">🌐 EN</button>
-          <button className="dl-btn">Download App</button>
+          <Link to="/#download" className="dl-btn">Download App</Link>
           <button className="burger" onClick={() => setOpen(o => !o)}>
             <span/><span/><span/>
           </button>
@@ -72,14 +78,16 @@ function Footer() {
       <div className="footer-bot">
         <div className="fbot-left">
           <button className="lang-btn">🌐 EN</button>
-          <img src="/assets/logo.png" alt="willTi" className="flogo" />
+          <img src="/assets/logo.png" alt="willTi" className="flogo" loading="lazy" decoding="async" />
           <div className="fsocials">
             <a href="#">f</a><a href="#">ig</a><a href="#">tt</a>
           </div>
         </div>
         <div className="fbot-mid">
           {['Terms and Conditions','Privacy','Insurance','Cookies','Security','Community Guidelines'].map(l =>
-            <a key={l} href="#">{l}</a>
+            l === 'Privacy'
+              ? <Link key={l} to="/privacy-policy">{l}</Link>
+              : <a key={l} href="#">{l}</a>
           )}
         </div>
         <div className="fbot-right">
@@ -112,26 +120,22 @@ function Faq({ items }) {
   )
 }
 
-// Interactive 3-step explainer used on Home and the How It Works page.
 function HiwBlock() {
   const [activeStep, setActiveStep] = useState(0)
   useEffect(() => {
     const t = setInterval(() => setActiveStep(s => (s + 1) % 3), 3000)
     return () => clearInterval(t)
   }, [])
-
   const images = [
     '/assets/hiw_choose_agencies.png',
     '/assets/hiw_pick_trip.png',
     '/assets/hiw_pay_methods.png',
   ]
-  const slideImg = images[activeStep]
-
   return (
     <div className="hiw-layout">
       <div className="hiw-left">
         <div className="hiw-img-wrap">
-          <img src={slideImg} alt="How it works" className="hiw-main-img" />
+          <img src={images[activeStep]} alt="How it works" className="hiw-main-img" loading="lazy" decoding="async" />
         </div>
         <div className="hiw-arrows">
           <button onClick={() => setActiveStep(s => (s + 2) % 3)} className="arr-btn" aria-label="Previous step">
@@ -153,7 +157,7 @@ function HiwBlock() {
           { title: 'Pick your trip', desc: 'Compare drivers or agencies, times, and prices.' },
           { title: 'Pay with mobile money', desc: 'MTN MoMo or Orange Money, fast and secure.' },
         ].map((s, i) => (
-          <div key={i} className={`hiw-step ${i === activeStep ? 'hiw-step-on' : ''}`}>
+          <div key={i} className={`hiw-step ${i === activeStep ? 'hiw-step-on' : ''}`} onClick={() => setActiveStep(i)}>
             <div className="hiw-bar"/>
             <div><h3>{s.title}</h3><p>{s.desc}</p></div>
           </div>
@@ -172,38 +176,48 @@ function Home() {
     { q: 'How does the ticket exchange work? Is it safe?', a: 'Ticket Exchange lets you resell an unused bus ticket to another Willti user at the original price. All exchanges are verified in-app.' },
   ]
 
+  // Single source of truth for the two service cards — one image, one text
+  // block per card, rendered exactly once. No duplicate markup anywhere.
+  const services = [
+    { img: '/assets/svc_ride_booking.png', title: 'Ride booking', desc: 'Hail a car in seconds. Transparent pricing, verified drivers, live tracking.' },
+    { img: '/assets/svc_bus_booking.png', title: 'Bus tickets booking', desc: 'Book seats at Vatican, General Express, Touristique, and more, no queue, no stress.' },
+  ]
+
   return (
     <>
       <div className="home-hero">
-        <img src="/assets/section2.png" alt="Move freely anywhere in Cameroon" />
+        <img src="/assets/rider_street_clean.png" alt="Move freely anywhere in Cameroon" loading="eager" decoding="async" />
+
+        <div className="home-hero-content">
+          <h1>Move freely, anywhere in Cameroon.</h1>
+          <p>From your street to any city, just one app necessary. Book travel tickets and rides today.</p>
+          <div className="hero-btns">
+            <button className="btn-g" onClick={() => document.getElementById('services')?.scrollIntoView({behavior:'smooth'})}>Book a Ride</button>
+            <button className="btn-outline" onClick={() => document.getElementById('services')?.scrollIntoView({behavior:'smooth'})}>Book Travel Ticket</button>
+          </div>
+        </div>
         <div className="hero-stats">
           <span>100+ Active Drivers</span>
           <span>6+ Functional Cities</span>
           <span>5+ Agencies Registered</span>
         </div>
-        <div className="hero-mobile-panel">
-          <h1>Move freely, anywhere in <span className="green">Cameroon</span>.</h1>
-          <p>From your street to any city, just one app necessary. Book travel tickets and rides.</p>
-          <div className="hero-mobile-btns">
-            <button className="btn-g">Book a Ride</button>
-            <button className="btn-outline">Book Travel Ticket</button>
-          </div>
-        </div>
       </div>
 
-      <section className="s-white">
+      <section className="s-white" id="services">
         <div className="wrap">
           <h2 className="h2d tc">Our services</h2>
           <p className="subd tc mx">Everything you need to move in Cameroon, from quick rides in the city to long-haul bus trips between regions. Willti has you covered.</p>
           <div className="svc-grid">
-            <div className="svc-card" style={{backgroundImage:`url(/assets/hero_bg.png)`}}>
-              <div className="svc-ov"/>
-              <div className="svc-txt"><h3>Ride booking</h3><p>Hail a car in seconds. Transparent pricing, verified drivers, live tracking.</p></div>
-            </div>
-            <div className="svc-card" style={{backgroundImage:`url(/assets/group.png)`}}>
-              <div className="svc-ov"/>
-              <div className="svc-txt"><h3>Bus tickets booking</h3><p>Book seats at Vatican, General Express, Touristique, and more, no queue, no stress.</p></div>
-            </div>
+            {services.map(s => (
+              <div className="svc-card" key={s.title}>
+                <img src={s.img} alt={s.title} className="svc-img" loading="lazy" decoding="async" />
+                <div className="svc-ov"/>
+                <div className="svc-txt">
+                  <h3>{s.title}</h3>
+                  <p>{s.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -233,7 +247,7 @@ function Home() {
             <p className="mission-p">To make movement across Cameroon effortless, affordable, and trustworthy by connecting people to rides, bus seats, and each other through technology that works for everyone, everywhere in the country.</p>
           </div>
           <div className="mission-phone">
-            <img src="/assets/phone_map2.png" alt="App map"/>
+            <img src="/assets/phone_map2.png" alt="App map" loading="lazy" decoding="async" />
           </div>
         </div>
       </section>
@@ -243,36 +257,36 @@ function Home() {
           <h2 className="h2d tc">Earn money with Willti</h2>
           <p className="subd tc mx">Join hundreds of partners nationwide that earn with Willti. Whether you own a car, manage a fleet, or run a travel agency, Willti gives you the tools to grow.</p>
           <div className="earn-row">
-            <div className="earn-img"><img src="/assets/media09.png" alt="Become a driver"/></div>
+            <div className="earn-img"><img src="/assets/media09.png" alt="Become a driver" loading="lazy" decoding="async" /></div>
             <div className="earn-txt">
               <h3>Become a Driver</h3>
               <p>Turn your car into a source of income. Sign up as a Willti driver, set your own hours, and start earning from rides in your city. Fast registration, transparent earnings, and weekly payouts straight to your Mobile Money account.</p>
-              <button className="btn-g">Become a driver</button>
+              <Link to="/drive" className="btn-g">Become a driver</Link>
             </div>
           </div>
           <div className="earn-row earn-rev">
             <div className="earn-txt">
               <h3>Register Your Car</h3>
               <p>Own a vehicle but don't want to drive? List your car on Willti and connect with verified, professional drivers who will operate it on your behalf. You earn, they drive, everyone wins.</p>
-              <button className="btn-g">Register your car</button>
+              <Link to="/drive" className="btn-g">Register your car</Link>
             </div>
-            <div className="earn-img"><img src="/assets/media10.png" alt="Register car"/></div>
+            <div className="earn-img"><img src="/assets/media10.png" alt="Register car" loading="lazy" decoding="async" /></div>
           </div>
           <div className="earn-row">
-            <div className="earn-img"><img src="/assets/media11.png" alt="Register agency"/></div>
+            <div className="earn-img"><img src="/assets/media11.png" alt="Register agency" loading="lazy" decoding="async" /></div>
             <div className="earn-txt">
               <h3>Register Your Travel Agency</h3>
               <p>Bring your bus agency onto Willti and sell tickets directly to thousands of travellers across Cameroon. No more empty seats. Manage your routes, schedules, and bookings all in one place.</p>
-              <button className="btn-g">Register your agency</button>
+              <Link to="/partner" className="btn-g">Register your agency</Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="s-dgreen">
+      <section className="s-dgreen" id="download">
         <div className="wrap tc">
           <h2 className="h2w">Download Willti</h2>
-          <img src="/assets/section4.png" alt="Download Willti" className="dl-img"/>
+          <img src="/assets/section4.png" alt="Download Willti" className="dl-img" loading="lazy" decoding="async" />
           <p className="subm" style={{marginBottom:'20px'}}>Available for iOS and Android devices.</p>
           <div className="store-row">
             <a href="#" className="store-btn">
@@ -295,7 +309,7 @@ function Home() {
           </div>
           <div className="news-grid">
             <div className="news-main">
-              <div className="news-main-img"><img src="/assets/news_scooter.png" alt="News"/></div>
+              <div className="news-main-img"><img src="/assets/news_scooter.png" alt="News" loading="lazy" decoding="async" /></div>
               <div className="news-body">
                 <span className="news-date">May 15, 2026</span>
                 <h3>Willti is now allowing ticket exchange! Changed travel plans? No problem.</h3>
@@ -309,7 +323,7 @@ function Home() {
                 {img:'/assets/overlay2.png',  date:'Apr 23, 2026', title:"Improving route planning in Bolt with driver partners'..."},
               ].map((n,i) => (
                 <div key={i} className="news-item">
-                  <div className="news-item-img"><img src={n.img} alt={n.title}/></div>
+                  <div className="news-item-img"><img src={n.img} alt={n.title} loading="lazy" decoding="async" /></div>
                   <div><h4>{n.title}</h4><span className="news-date">{n.date}</span></div>
                 </div>
               ))}
@@ -340,7 +354,6 @@ function HowItWorks() {
           <HiwBlock/>
         </div>
       </section>
-
       <section className="s-dark">
         <div className="wrap">
           <div className="safety-grid">
@@ -372,12 +385,11 @@ function Drive() {
   return (
     <>
       <div className="drive-hero">
-        <img src="/assets/ride_booking.png" alt="Drive with Willti"/>
-        <div className="drive-ov"/>
+        <img src="/assets/ride_booking.png" alt="Drive with Willti" loading="eager" decoding="async" />
         <div className="drive-txt">
           <h1>Drive More.<br/><span className="green">Earn More.</span></h1>
           <p>Join Willti and turn every trip into income.</p>
-          <button className="btn-g">Download App</button>
+          <button className="btn-g" onClick={() => document.getElementById('get-started')?.scrollIntoView({behavior:'smooth'})}>Download App</button>
         </div>
       </div>
 
@@ -392,14 +404,14 @@ function Drive() {
               {img:'/assets/cal2.png', title:'100% Secure', desc:'The best team filters and verifies every information, so you are always 100% safe.'},
             ].map(w => (
               <div key={w.title} className="why-card">
-                <img src={w.img} alt={w.title}/><h3>{w.title}</h3><p>{w.desc}</p>
+                <img src={w.img} alt={w.title} loading="lazy" decoding="async" /><h3>{w.title}</h3><p>{w.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="s-dgreen">
+      <section className="s-dgreen" id="get-started">
         <div className="wrap">
           <div className="eyebrow">4 Simple Steps</div>
           <h2 className="h2w">How To Get Started?</h2>
@@ -460,7 +472,7 @@ function Drive() {
               ].map(l => <li key={l}>{l}</li>)}
             </ul>
           </div>
-          <div className="driver-phone"><img src="/assets/driver_phone.png" alt="Driver app"/></div>
+          <div className="driver-phone"><img src="/assets/driver_phone.png" alt="Driver app" loading="lazy" decoding="async" /></div>
         </div>
       </section>
 
@@ -482,11 +494,10 @@ function Partner() {
   return (
     <>
       <div className="partner-hero">
-        <img src="/assets/bus_booking.png" alt="Partner with Willti"/>
-        <div className="partner-scrim"/>
-        <div className="partner-mobile-panel">
+        <img src="/assets/bus_fleet_clean.png" alt="Partner with Willti" loading="eager" decoding="async" />
+        <div className="partner-txt">
           <h1>Fill every seat.<br/><span className="green">Grow your agency.</span></h1>
-          <p>Connect your buses to thousands of travellers across Cameroon, with real-time bookings and instant Mobile Money payouts.</p>
+          <p>List your routes on Willti and sell tickets to thousands of travellers across Cameroon, no empty buses, no queues, no paperwork.</p>
         </div>
       </div>
 
@@ -511,9 +522,9 @@ function Partner() {
         </div>
       </section>
 
-      <section className="s-white stats-sec">
+      <section className="s-pale stats-sec">
         <div className="wrap">
-          <div className="stats-img"><img src="/assets/woman_bus.png" alt="Traveller"/></div>
+          <div className="stats-img"><img src="/assets/woman_bus.png" alt="Traveller" loading="lazy" decoding="async" /></div>
           <div className="stats-row">
             <div className="stat"><span className="stat-n">10K+</span><span className="stat-l">Active Drivers</span></div>
             <div className="stat-div"/>
@@ -687,6 +698,218 @@ function Support() {
   )
 }
 
+// ── PRIVACY POLICY ────────────────────────────────────────────────────────────
+function PrivacyPolicy() {
+  const sections = [
+    {
+      title: '1. Information We Collect',
+      body: (
+        <>
+          <p>We may collect the following categories of information:</p>
+          <h4>A. Personal Information</h4>
+          <p>When you create an account or use our Services, we may collect:</p>
+          <ul className="legal-list">
+            <li>Full name</li>
+            <li>Email address</li>
+            <li>Phone number</li>
+            <li>Profile picture</li>
+            <li>Home and work addresses</li>
+            <li>Payment details (processed securely through trusted third-party payment providers)</li>
+            <li>Government-issued identification (where required for verification)</li>
+          </ul>
+          <h4>B. Location Information</h4>
+          <p>To provide ride-hailing and bus-booking services effectively, we collect:</p>
+          <ul className="legal-list">
+            <li>Real-time GPS location</li>
+            <li>Pickup and drop-off locations</li>
+            <li>Route and trip history</li>
+            <li>Background location data (when enabled and necessary for trip tracking)</li>
+          </ul>
+          <p>Location information is used for: matching passengers with drivers, navigating routes, tracking bus departures and arrivals, and enhancing safety and fraud prevention.</p>
+          <h4>C. Device Information</h4>
+          <p>We automatically collect: device model, operating system, unique device identifiers, IP address, mobile network information, app version, crash logs, and diagnostic information.</p>
+          <h4>D. Payment and Transaction Information</h4>
+          <p>We may collect payment confirmations, booking history, ride history, refund records, and transaction details.</p>
+          <p><strong>Important:</strong> Willti does not store complete card or banking information.</p>
+          <h4>E. Communications Data</h4>
+          <p>We may collect communications between riders and drivers, passengers and transport operators, and users and customer support. This may include chats, emails, and masked call logs.</p>
+        </>
+      ),
+    },
+    {
+      title: '2. How We Use Your Information',
+      body: (
+        <ul className="legal-list">
+          <li>Create and manage user accounts</li>
+          <li>Facilitate ride-hailing services</li>
+          <li>Process bus ticket reservations</li>
+          <li>Track rides and trips</li>
+          <li>Process payments and refunds</li>
+          <li>Improve platform performance</li>
+          <li>Personalize user experiences</li>
+          <li>Prevent fraud and unauthorized access</li>
+          <li>Verify user identities</li>
+          <li>Provide customer support</li>
+          <li>Send service notifications and updates</li>
+          <li>Comply with legal obligations</li>
+        </ul>
+      ),
+    },
+    {
+      title: '3. Location Permissions',
+      body: (
+        <>
+          <p>Willti requires location access to function properly.</p>
+          <h4>Foreground Location</h4>
+          <p>Used while the app is active for: booking rides, finding nearby drivers, and tracking buses.</p>
+          <h4>Background Location</h4>
+          <p>May be used for: live ride tracking, emergency safety services, trip monitoring, and route optimization.</p>
+          <p>Disabling location access may limit certain features.</p>
+        </>
+      ),
+    },
+    {
+      title: '4. How We Share Your Information',
+      body: (
+        <>
+          <h4>Service Providers</h4>
+          <p>Third-party companies that help us operate our platform, including payment processors, cloud service providers, analytics tools, navigation providers, and communication service providers.</p>
+          <h4>Drivers and Transport Operators</h4>
+          <p>To fulfill ride or bus bookings, we may share name, contact information, and pickup and destination details.</p>
+          <h4>Legal Authorities</h4>
+          <p>When required by law, regulation, or legal process.</p>
+          <h4>Business Transfers</h4>
+          <p>In the event of a merger, acquisition, or sale of business assets.</p>
+          <p><strong>Willti does not sell your personal information.</strong></p>
+        </>
+      ),
+    },
+    {
+      title: '5. Data Security',
+      body: (
+        <>
+          <p>We encrypt data in transit (SSL/TLS), restrict access to systems that hold personal information, and run fraud monitoring on transactions and accounts.</p>
+          <p>That said, no platform can guarantee perfect security, and we'd rather be upfront about that than make a promise we can't keep.</p>
+        </>
+      ),
+    },
+    {
+      title: '6. Data Retention',
+      body: (
+        <p>We keep user data for as long as it's needed, to run the Services, meet legal requirements, resolve disputes, or prevent fraud, and delete or anonymize it once that need has passed.</p>
+      ),
+    },
+    {
+      title: '7. Your Rights',
+      body: (
+        <>
+          <p>Depending on your jurisdiction, you may have the right to:</p>
+          <ul className="legal-list">
+            <li>Access your personal data</li>
+            <li>Update inaccurate information</li>
+            <li>Request deletion of your data</li>
+            <li>Restrict data processing</li>
+            <li>Withdraw consent</li>
+            <li>Request data portability</li>
+            <li>Object to data processing</li>
+          </ul>
+          <p>To exercise these rights, contact us at <a href="mailto:willti@crestlancing.com" className="green">willti@crestlancing.com</a>.</p>
+        </>
+      ),
+    },
+    {
+      title: "8. Children's Privacy",
+      body: (
+        <p>Willti does not knowingly collect personal information from children under 13 years old (or the applicable legal age in your country). If we discover such information has been collected, we will delete it immediately.</p>
+      ),
+    },
+    {
+      title: '9. Third-Party Services',
+      body: (
+        <p>Some parts of Willti run on third-party infrastructure, Google Maps for navigation, Stripe and PayPal for payments, Twilio for messaging, and Firebase for backend services. Each of these has its own privacy policy worth a look if you want the full picture.</p>
+      ),
+    },
+    {
+      title: '10. International Data Transfers',
+      body: (
+        <p>Some of our service providers operate outside Cameroon, so your data may be processed there too. Using Willti means you're okay with that, wherever it's legally permitted.</p>
+      ),
+    },
+    {
+      title: '11. Account Deletion',
+      body: (
+        <>
+          <p>Want your account gone? You can do that from account settings in the app, by reaching customer support, or by emailing <a href="mailto:willti@crestlancing.com" className="green">willti@crestlancing.com</a> directly.</p>
+          <p>A few records may stick around afterward if the law requires it, but everything else goes.</p>
+        </>
+      ),
+    },
+    {
+      title: '12. Permissions We Request',
+      body: (
+        <p>Depending on how you use the app, Willti may ask for location, camera, microphone, storage, contacts, or notification access, each tied to a specific feature, never collected just to have it.</p>
+      ),
+    },
+    {
+      title: '13. Cookies and Tracking Technologies',
+      body: (
+        <>
+          <p>We use cookies and a handful of SDKs to keep the app fast, catch bugs, spot fraud, and understand how people actually use Willti.</p>
+          <p>Most of this can be limited or turned off from your device settings if you'd rather opt out.</p>
+        </>
+      ),
+    },
+    {
+      title: '14. Changes to This Privacy Policy',
+      body: (
+        <p>We'll update this policy from time to time. For anything significant, we'll let you know, in-app, by email, or on the website, rather than quietly changing it. Sticking with Willti after an update means you're fine with the new version.</p>
+      ),
+    },
+    {
+      title: '15. Contact Us',
+      body: (
+        <p>
+          If you have questions about this Privacy Policy, contact us:<br/>
+          Willti<br/>
+          Email: <a href="mailto:willti@crestlancing.com" className="green">willti@crestlancing.com</a><br/>
+          Address: Yaoundé, Cameroon
+        </p>
+      ),
+    },
+    {
+      title: '16. Compliance Statement',
+      body: (
+        <p>Willti complies with privacy and data protection requirements for mobile applications distributed through Google Play and the Apple App Store, including requirements for transparency, user consent, account deletion, and responsible handling of personal data.</p>
+      ),
+    },
+  ]
+
+  return (
+    <section className="s-white legal-page">
+      <div className="wrap legal-wrap">
+        <h1 className="h2d">Privacy Policy</h1>
+        <p className="legal-meta">Effective Date: June 25, 2026 &nbsp;·&nbsp; Last Updated: June 25, 2026</p>
+        <p className="legal-intro">
+          This Privacy Policy describes how Willti ("we," "our," "us") collects, uses, shares, and protects information when you use our apps and services, including ride-hailing and intercity bus booking, together referred to here as the "Services."
+        </p>
+        <p className="legal-intro">
+          It's written to be readable, not just compliant. We've tried to keep the legal language to a minimum while still meeting the requirements of Google Play, the Apple App Store, GDPR, CCPA, and Cameroon's applicable data protection rules.
+        </p>
+        <p className="legal-intro">
+          By using Willti, you're agreeing to what's described below.
+        </p>
+
+        {sections.map(s => (
+          <div key={s.title} className="legal-section">
+            <h3>{s.title}</h3>
+            {s.body}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export default function App() {
   return (
     <Router>
@@ -699,6 +922,7 @@ export default function App() {
           <Route path="/drive" element={<Drive/>}/>
           <Route path="/partner" element={<Partner/>}/>
           <Route path="/support" element={<Support/>}/>
+          <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
         </Routes>
       </main>
       <Footer/>

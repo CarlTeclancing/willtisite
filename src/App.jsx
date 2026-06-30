@@ -179,14 +179,14 @@ function Home() {
   // Single source of truth for the two service cards — one image, one text
   // block per card, rendered exactly once. No duplicate markup anywhere.
   const services = [
-    { img: '/assets/svc_ride_booking.png', title: 'Ride booking', desc: 'Hail a car in seconds. Transparent pricing, verified drivers, live tracking.' },
-    { img: '/assets/svc_bus_booking.png', title: 'Bus tickets booking', desc: 'Book seats at Vatican, General Express, Touristique, and more, no queue, no stress.' },
+    { img: '/assets/svc_ride_booking.jpg', title: 'Ride booking', desc: 'Hail a car in seconds. Transparent pricing, verified drivers, live tracking.' },
+    { img: '/assets/svc_bus_booking.jpg', title: 'Bus tickets booking', desc: 'Book seats at Vatican, General Express, Touristique, and more, no queue, no stress.' },
   ]
 
   return (
     <>
       <div className="home-hero">
-        <img src="/assets/rider_street_clean.png" alt="Move freely anywhere in Cameroon" loading="eager" decoding="async" />
+        <img src="/assets/rider_street_clean.jpg" alt="Move freely anywhere in Cameroon" loading="eager" decoding="async" />
 
         <div className="home-hero-content">
           <h1>Move freely, anywhere in Cameroon.</h1>
@@ -494,7 +494,7 @@ function Partner() {
   return (
     <>
       <div className="partner-hero">
-        <img src="/assets/bus_fleet_clean.png" alt="Partner with Willti" loading="eager" decoding="async" />
+        <img src="/assets/bus_fleet_clean.jpg" alt="Partner with Willti" loading="eager" decoding="async" />
         <div className="partner-txt">
           <h1>Fill every seat.<br/><span className="green">Grow your agency.</span></h1>
           <p>List your routes on Willti and sell tickets to thousands of travellers across Cameroon, no empty buses, no queues, no paperwork.</p>

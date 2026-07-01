@@ -408,3 +408,10 @@ footer{background:#111;color:#fff;padding:64px 0 0}
   .logo-img{height:26px}
   .svc-grid{grid-template-columns:1fr}
 }
+
+/* ── DELETE ACCOUNT FORM ── */
+.delete-form{max-width:600px;margin-top:40px;display:flex;flex-direction:column;gap:24px}
+.delete-form .fg input,.delete-form .fg textarea{border:1.5px solid var(--g);border-radius:8px;padding:13px 14px;font-size:16px;font-family:inherit;color:#111;background:#fff;width:100%}
+.delete-form .fg input:focus,.delete-form .fg textarea:focus{outline:none;border-color:var(--gd)}
+.delete-form .fg textarea{resize:vertical;min-height:100px}
+.delete-form .btn-submit{max-width:320px}

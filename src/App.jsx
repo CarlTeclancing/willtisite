@@ -176,8 +176,6 @@ function Home() {
     { q: 'How does the ticket exchange work? Is it safe?', a: 'Ticket Exchange lets you resell an unused bus ticket to another Willti user at the original price. All exchanges are verified in-app.' },
   ]
 
-  // Single source of truth for the two service cards — one image, one text
-  // block per card, rendered exactly once. No duplicate markup anywhere.
   const services = [
     { img: '/assets/svc_ride_booking.jpg', title: 'Ride booking', desc: 'Hail a car in seconds. Transparent pricing, verified drivers, live tracking.' },
     { img: '/assets/svc_bus_booking.jpg', title: 'Bus tickets booking', desc: 'Book seats at Vatican, General Express, Touristique, and more, no queue, no stress.' },
@@ -187,7 +185,6 @@ function Home() {
     <>
       <div className="home-hero">
         <img src="/assets/rider_street_clean.jpg" alt="Move freely anywhere in Cameroon" loading="eager" decoding="async" />
-
         <div className="home-hero-content">
           <h1>Move freely, anywhere in Cameroon.</h1>
           <p>From your street to any city, just one app necessary. Book travel tickets and rides today.</p>
@@ -698,74 +695,6 @@ function Support() {
   )
 }
 
-// ── DELETE ACCOUNT REQUEST ────────────────────────────────────────────────────
-function DeleteAccountRequest() {
-  const [form, setForm] = useState({ name: '', email: '', reason: '' })
-  const [sent, setSent] = useState(false)
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // For now this just confirms receipt in the UI.
-    // Wire this to a real endpoint/email service once the backend route exists.
-    setSent(true)
-  }
-
-  return (
-    <section className="s-white legal-page">
-      <div className="wrap legal-wrap form-wrap">
-        <h1 className="h2d">Request Account Deletion</h1>
-        <p className="legal-intro">
-          Use this form to request permanent deletion of your Willti account and associated data.
-          We'll process your request and confirm by email within a few business days, in line with
-          our <Link to="/privacy-policy" className="green">Privacy Policy</Link>.
-        </p>
-
-        {sent ? (
-          <div className="legal-section">
-            <h3>Request received</h3>
-            <p>Thanks — we've logged your deletion request. We'll follow up at the email address you provided to confirm once your account and data have been removed.</p>
-          </div>
-        ) : (
-          <form className="form-grid" onSubmit={handleSubmit}>
-            <div className="fg full">
-              <label>Full Name</label>
-              <input
-                required
-                value={form.name}
-                onChange={e => set('name', e.target.value)}
-                placeholder="Enter your full name"
-              />
-            </div>
-            <div className="fg full">
-              <label>Account Email</label>
-              <input
-                required
-                type="email"
-                value={form.email}
-                onChange={e => set('email', e.target.value)}
-                placeholder="The email linked to your Willti account"
-              />
-            </div>
-            <div className="fg full">
-              <label>Reason for deletion (optional)</label>
-              <textarea
-                rows={5}
-                value={form.reason}
-                onChange={e => set('reason', e.target.value)}
-                placeholder="Let us know why you're leaving, this helps us improve"
-              />
-            </div>
-            <div className="full">
-              <button type="submit" className="btn-submit">Submit Deletion Request</button>
-            </div>
-          </form>
-        )}
-      </div>
-    </section>
-  )
-}
-
 // ── PRIVACY POLICY ────────────────────────────────────────────────────────────
 function PrivacyPolicy() {
   const sections = [
@@ -909,6 +838,7 @@ function PrivacyPolicy() {
         <>
           <p>Want your account gone? You can do that from account settings in the app, by reaching customer support, or by emailing <a href="mailto:willti@crestlancing.com" className="green">willti@crestlancing.com</a> directly.</p>
           <p>A few records may stick around afterward if the law requires it, but everything else goes.</p>
+          <p>You can also submit a deletion request directly: <Link to="/delete/request" className="green">Request Account Deletion</Link>.</p>
         </>
       ),
     },
@@ -966,13 +896,91 @@ function PrivacyPolicy() {
         <p className="legal-intro">
           By using Willti, you're agreeing to what's described below.
         </p>
-
         {sections.map(s => (
           <div key={s.title} className="legal-section">
             <h3>{s.title}</h3>
             {s.body}
           </div>
         ))}
+      </div>
+    </section>
+  )
+}
+
+// ── DELETE ACCOUNT REQUEST ────────────────────────────────────────────────────
+function DeleteAccountRequest() {
+  const [form, setForm] = useState({ email: '', name: '', reason: '' })
+  const [submitted, setSubmitted] = useState(false)
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  const handleSubmit = () => {
+    if (!form.email || !form.name) return
+    setSubmitted(true)
+  }
+
+  if (submitted) {
+    return (
+      <section className="s-white legal-page">
+        <div className="wrap legal-wrap" style={{ textAlign: 'center', padding: '80px 48px' }}>
+          <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'var(--pale)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+              <path d="M5 13l4 4L19 7" stroke="var(--g)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 className="h2d">Request received</h2>
+          <p style={{ fontSize: 16, color: '#555', maxWidth: 480, margin: '0 auto 32px', lineHeight: 1.7 }}>
+            We've received your account deletion request for <strong>{form.email}</strong>. Our team will process it within 30 days and confirm by email once your data has been removed.
+          </p>
+          <Link to="/" className="btn-g">Back to Home</Link>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section className="s-white legal-page">
+      <div className="wrap legal-wrap">
+        <h1 className="h2d">Request Account Deletion</h1>
+        <p className="legal-meta">Under our Privacy Policy, you have the right to request deletion of your Willti account and associated personal data.</p>
+        <p className="legal-intro">
+          Fill in the form below and our team will process your request within 30 days. You'll receive a confirmation email once your account and data have been permanently removed. Note that some records may be retained where required by law.
+        </p>
+
+        <div className="delete-form">
+          <div className="fg">
+            <label>Full Name</label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={e => set('name', e.target.value)}
+              placeholder="Enter your full name"
+            />
+          </div>
+          <div className="fg">
+            <label>Email Address linked to your account</label>
+            <input
+              type="email"
+              value={form.email}
+              onChange={e => set('email', e.target.value)}
+              placeholder="you@example.com"
+            />
+          </div>
+          <div className="fg">
+            <label>Reason for deletion <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: '#999' }}>(optional)</span></label>
+            <textarea
+              rows={4}
+              value={form.reason}
+              onChange={e => set('reason', e.target.value)}
+              placeholder="Tell us why you're leaving — this helps us improve Willti."
+            />
+          </div>
+          <p style={{ fontSize: 13, color: '#888', marginBottom: 24, lineHeight: 1.6 }}>
+            By submitting this form, you confirm that you are the account holder and you understand that this action is permanent and cannot be undone.
+          </p>
+          <button className="btn-submit" onClick={handleSubmit}>
+            Submit Deletion Request
+          </button>
+        </div>
       </div>
     </section>
   )
@@ -992,7 +1000,6 @@ export default function App() {
           <Route path="/support" element={<Support/>}/>
           <Route path="/privacy-policy" element={<PrivacyPolicy/>}/>
           <Route path="/delete/request" element={<DeleteAccountRequest/>}/>
-
         </Routes>
       </main>
       <Footer/>
